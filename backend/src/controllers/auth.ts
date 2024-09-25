@@ -36,17 +36,20 @@ export const signup = async (req:Request, res:Response, next: NextFunction) => {
 }
 
 export const login = async (req:Request, res:Response, next:NextFunction) => {
-    const username = req.body.username;
+    const email = req.body.email;
     const password = req.body.password;
 
-    let user = await prismaClient.user.findFirst({where:{username}})
+    console.log(email, password)
+
+    let user = await prismaClient.user.findFirst({where:{email}})
+    console.log(user)
 
     if(!user){
         next(new BadRequestsException("User Does not Exist", ErrorCode.USER_NOT_FOUND))
     }
 
     else if(bcrypt.compareSync(password, user.password)){
-        const token = jwt.sign({username}, JWT_PASSWORD)
+        const token = jwt.sign({email}, JWT_PASSWORD)
 
         res.json({
             status:"Success",
@@ -56,10 +59,6 @@ export const login = async (req:Request, res:Response, next:NextFunction) => {
     }
     else{
         next(new BadRequestsException("Incorrect Password", ErrorCode.INCORRECT_PASSWORD))
-        res.json({
-            status:"Fail",
-            message:"Wrong Password"
-        })
     }
 
 }
