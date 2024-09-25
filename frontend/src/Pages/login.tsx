@@ -1,7 +1,20 @@
-import React from "react";
+import {useState} from "react";
 import "../App.css";
+import axiosInstance from "../utils/axiosInstance";
 
 const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("")
+
+  const login = async () => {
+    const response = await axiosInstance.post("/auth/login", {
+      email,
+      password
+    })
+
+    console.log(response)
+  } 
+
   return (
     <div className="flex w-full h-screen">
       {/* first Div for the lefthand side */}
@@ -17,6 +30,7 @@ const Login = () => {
               <input
                 className="w-full border-2 border-gray-100 rounded-xl p-4 mt-1 bg-transparent"
                 placeholder="Enter Your Email"
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div>
@@ -25,6 +39,7 @@ const Login = () => {
                 className="w-full border-2 border-gray-100 rounded-xl p-4 mt-1 bg-transparent"
                 placeholder="Enter Your Passowrd"
                 type="password"
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
             <div className="mt-8 flex justify-between">
@@ -40,7 +55,7 @@ const Login = () => {
             </div>
             <div className="justify-center">
               <div className="mt-8 flex justify-center space-x-10 justify-center">
-                <button className="active:scale-[.95] active:duration-75 hover:scale-[1.05] ease-in-out transition-all w-100 px-6 py-4  rounded-full bg-violet-500 text-white text-lg font-bold w-full">
+                <button className="active:scale-[.95] active:duration-75 hover:scale-[1.05] ease-in-out transition-all w-100 px-6 py-4  rounded-full bg-violet-500 text-white text-lg font-bold w-full" onClick={login}>
                   Sign In
                 </button>
               </div>
