@@ -1,13 +1,19 @@
-import { Route } from "react-router";
+import { Routes, Route } from "react-router-dom";
+
 import "./App.css";
 import Login from "./Pages/login";
-import Test from "./Pages/test";
+import Dashboard from "./Pages/Dashboard";
+import SignUp from "./Pages/SignUp";
 
 function App() {
   return (
     <div className="flex">
-      <Route component={Login} path={"/login"}></Route>
-      <Route component={Test} path={"/test"}></Route>
+      <Routes>
+        {/* Use `element` instead of `component` */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Routes>
     </div>
   );
 }

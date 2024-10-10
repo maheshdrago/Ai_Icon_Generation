@@ -1,7 +1,36 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import "../App.css";
+import axiosInstance from "../utils/axiosInstance";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [token, setToken] = useState("");
+  
+  const navigate = useNavigate()
+
+  const login = async (e:React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    
+    const response = await axiosInstance.post("/auth/login", {
+      email,
+      password,
+    });
+    console.log(response)
+    setToken(response.data.access_token);
+
+  };
+
+
+
+  useEffect(() => {
+    if(token){
+      navigate("/dashboard", {state: { token }})
+    }
+  }, [token])
+
+
   return (
     <div className="flex w-full h-screen">
       {/* first Div for the lefthand side */}
@@ -11,47 +40,57 @@ const Login = () => {
           <p className="font-medium text-lg text-gray-500 mt-4">
             Welcome Back! Please Enter your details{" "}
           </p>
-          <div className="mt-8">
-            <div>
-              <label className="text-lg font-medium">Email</label>
-              <input
-                className="w-full border-2 border-gray-100 rounded-xl p-4 mt-1 bg-transparent"
-                placeholder="Enter Your Email"
-              />
-            </div>
-            <div>
-              <label className="text-lg font-medium">Password</label>
-              <input
-                className="w-full border-2 border-gray-100 rounded-xl p-4 mt-1 bg-transparent"
-                placeholder="Enter Your Passowrd"
-                type="password"
-              />
-            </div>
-            <div className="mt-8 flex justify-between">
+          <form onSubmit={(e) => login(e)}>
+            <div className="mt-8">
               <div>
-                <input type="checkbox" id="remember" />
-                <label className="ml-2 font-medium text-base" for="remember">
-                  RememberMe
-                </label>
+                <label className="text-lg font-medium">Email</label>
+                <input
+                  className="w-full border-2 border-gray-100 rounded-xl p-4 mt-1 bg-transparent"
+                  placeholder="Enter Your Email"
+                  onChange={(e) => setEmail(e.target.value)}
+                />
               </div>
-              <button className="font-medium text-base text-violet-500">
-                Forgot Password
-              </button>
-            </div>
-            <div className="justify-center">
-              <div className="mt-8 flex justify-center space-x-10 justify-center">
-                <button className="active:scale-[.95] active:duration-75 hover:scale-[1.05] ease-in-out transition-all w-100 px-6 py-4  rounded-full bg-violet-500 text-white text-lg font-bold w-full">
-                  Sign In
+              <div>
+                <label className="text-lg font-medium">Password</label>
+                <input
+                  className="w-full border-2 border-gray-100 rounded-xl p-4 mt-1 bg-transparent"
+                  placeholder="Enter Your Passowrd"
+                  type="password"
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+              <div className="mt-8 flex justify-between">
+                <div>
+                  <input type="checkbox" id="remember" />
+                  <label className="ml-2 font-medium text-base">
+                    RememberMe
+                  </label>
+                </div>
+                <button className="font-medium text-base text-violet-500">
+                  Forgot Password
                 </button>
               </div>
-              <div className="mt-8 flex justify-center items-center">
-                <p className="font-medium text-base">Don't Have a Account</p>
-                <button className="text-violet-500 text-base font-medium ml-2">
-                  Sign Up
-                </button>
+              <div className="justify-center">
+                <div className="mt-8 flex justify-center space-x-10 ">
+                  <button
+                  type="submit"
+                    className="active:scale-[.95] active:duration-75 hover:scale-[1.05] ease-in-out transition-all w-100 px-6 py-4  rounded-full bg-violet-500 text-white text-lg font-bold w-full"
+                  >
+                    Sign In
+                  </button>
+                </div>
+                <div className="mt-8 flex justify-center items-center">
+                  <p className="font-medium text-base">Don't Have a Account?</p>
+                  <button
+                    // onClick={routeChange}
+                    className="text-violet-500 text-base font-medium ml-2"
+                  >
+                    Sign Up
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
+          </form>
         </div>
       </div>
       {/* right side of the page */}
