@@ -14,3 +14,9 @@ export class InternalServerError extends HttpException{
         super(errorCode, 500, message, errors )
     }
 }
+
+export class AuthorizationError extends HttpException{
+    constructor(message:string,  errorCode:ErrorCode, errors:any){
+        super(errorCode, 401, message, errors)
+    }
+}

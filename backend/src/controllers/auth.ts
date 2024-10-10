@@ -2,11 +2,12 @@ import { NextFunction, Request, Response } from "express";
 import { prismaClient } from "..";
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
-import { JWT_PASSWORD } from "../secrets";
+import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "../secrets";
 import { BadRequestsException } from "../exceptions/bad-requests";
 import { ErrorCode } from "../exceptions/root";
 import { SignupSchema, LoginSchema } from "../schema/auth";
-import { UnProcessableEntity } from "../exceptions/validations";
+import { AuthorizationError } from "../exceptions/validations";
+
 
 
 
@@ -54,17 +55,56 @@ export const login = async (req:Request, res:Response, next:NextFunction) => {
         }
 
         else if(bcrypt.compareSync(password, user.password)){
-            const token = jwt.sign({email}, JWT_PASSWORD)
+            const access_token = jwt.sign({email}, ACCESS_TOKEN_KEY, {expiresIn: "30s"}, )
+            const refresh_token = jwt.sign({email}, REFRESH_TOKEN_KEY, {expiresIn:"1m"})
+
+            res.cookie("REFRESH_TOKEN", refresh_token, {
+                httpOnly: true,
+                maxAge: 60*1000,
+                sameSite:"none",
+                secure: true,
+            })
 
             res.json({
                 status:"Success",
                 message:"Login Successfull",
-                token
+                access_token,
             })
+
         }
         else{
             throw new BadRequestsException("Incorrect Password", ErrorCode.INCORRECT_PASSWORD)
         }
 }
+
+
+export const refreshAccessToken = async (req:Request, res:Response, next:NextFunction) => {
+
+    const cookies = req.cookies
     
+    if(!cookies?.REFRESH_TOKEN){
+         next(new AuthorizationError("User access denied", ErrorCode.UNAUTHORIZED_ERROR, null))
+    }
+    else{
+        try{
+            const payload = jwt.verify(cookies.REFRESH_TOKEN, REFRESH_TOKEN_KEY) as any
+            const email = payload.email
+
+            const user = await prismaClient.user.findFirst({where:{email}})
+            if(!user){
+                next(new AuthorizationError("User unauthorized", ErrorCode.UNAUTHORIZED_ERROR, null))
+            }
+            else{
+                const accessToken = jwt.sign({email}, ACCESS_TOKEN_KEY, {expiresIn:"30s"})
+                res.json({
+                    access_token: accessToken
+                })
+            }
+        }
+        catch(err){
+            next(new AuthorizationError("Invalid token", ErrorCode.UNAUTHORIZED_ERROR, null))
+        }
+        
+    }
+}
 

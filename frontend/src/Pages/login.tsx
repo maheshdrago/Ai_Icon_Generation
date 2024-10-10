@@ -1,28 +1,35 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "../App.css";
 import axiosInstance from "../utils/axiosInstance";
-// import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-//let navigate = useNavigate();
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [token, setToken] = useState("");
+  
+  const navigate = useNavigate()
 
-  const login = async () => {
+  const login = async (e:React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    
     const response = await axiosInstance.post("/auth/login", {
       email,
       password,
     });
+    console.log(response)
+    setToken(response.data.access_token);
 
-    console.log(response);
   };
 
-  // const history = useHistory();
 
-  // const routeChange = () => {
-  //   let path = `/signup`;
-  //   history.push(path);
-  // };
+
+  useEffect(() => {
+    if(token){
+      navigate("/dashboard", {state: { token }})
+    }
+  }, [token])
+
 
   return (
     <div className="flex w-full h-screen">
@@ -33,7 +40,7 @@ const Login = () => {
           <p className="font-medium text-lg text-gray-500 mt-4">
             Welcome Back! Please Enter your details{" "}
           </p>
-          <form>
+          <form onSubmit={(e) => login(e)}>
             <div className="mt-8">
               <div>
                 <label className="text-lg font-medium">Email</label>
@@ -66,8 +73,8 @@ const Login = () => {
               <div className="justify-center">
                 <div className="mt-8 flex justify-center space-x-10 ">
                   <button
+                  type="submit"
                     className="active:scale-[.95] active:duration-75 hover:scale-[1.05] ease-in-out transition-all w-100 px-6 py-4  rounded-full bg-violet-500 text-white text-lg font-bold w-full"
-                    onClick={login}
                   >
                     Sign In
                   </button>
