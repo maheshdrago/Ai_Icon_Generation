@@ -1,4 +1,3 @@
-import Cookie from "js-cookie"
 import axiosInstance from "./axiosInstance"
 
 export const refreshToken = async () => {

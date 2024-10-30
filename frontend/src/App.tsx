@@ -6,13 +6,14 @@ import Dashboard from "./Pages/Dashboard";
 import SignUp from "./Pages/SignUp";
 
 function App() {
+  const is_loggedin = true
   return (
     <div className="flex">
       <Routes>
         {/* Use `element` instead of `component` */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/login" element={<Login is_loggedin={is_loggedin}/>} />
+        <Route path="/signup" element={<SignUp is_loggedin={is_loggedin}/>} />
+        <Route path="/dashboard" element={<Dashboard is_loggedin={is_loggedin}/>} />
       </Routes>
     </div>
   );

@@ -3,7 +3,7 @@ import "../App.css";
 import axiosInstance from "../utils/axiosInstance";
 import { useNavigate } from "react-router-dom";
 
-const Login = () => {
+const Login = ({ is_loggedin}:{is_loggedin:boolean}) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [token, setToken] = useState("");

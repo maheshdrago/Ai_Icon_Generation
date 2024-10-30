@@ -1,9 +1,14 @@
 import axios from "axios";
 import { refreshToken } from "./auth";
+const apiToken = ""
 
 const axiosInstance = axios.create({
+    
     baseURL: "http://localhost:3000/api/",
-    withCredentials:true
+    withCredentials:true,
+    headers: {
+        "Authorization":`Bearer ${apiToken}`
+      }
 })
 
 axiosInstance.interceptors.response.use(response => response, async (err) => {

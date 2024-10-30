@@ -1,0 +1,10 @@
+.color-selector {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(4rem, 1fr));
+}
+
+.icon-styles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(4rem, 1fr));
+  gap: 3rem;
+}
