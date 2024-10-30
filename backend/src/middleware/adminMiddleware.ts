@@ -11,9 +11,10 @@ export const AdminMiddleware = async (req:Request, res:Response, next:NextFuncti
     const user = await prismaClient.user.findFirst({where: {email: email}})
     
     if(user?.role == "USER"){
-        throw new AuthorizationError("User not Authorised",ErrorCode.UNAUTHORIZED_ERROR, null )
+        next(new AuthorizationError("User not Authorised",ErrorCode.UNAUTHORIZED_ERROR, null ))
     }
     else{
         next()
     }
 }
+

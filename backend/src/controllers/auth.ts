@@ -55,12 +55,12 @@ export const login = async (req:Request, res:Response, next:NextFunction) => {
         }
 
         else if(bcrypt.compareSync(password, user.password)){
-            const access_token = jwt.sign({email}, ACCESS_TOKEN_KEY, {expiresIn: "30s"}, )
-            const refresh_token = jwt.sign({email}, REFRESH_TOKEN_KEY, {expiresIn:"1m"})
+            const access_token = jwt.sign({email}, ACCESS_TOKEN_KEY, {expiresIn: "1d"}, )
+            const refresh_token = jwt.sign({email}, REFRESH_TOKEN_KEY, {expiresIn:"10m"})
 
             res.cookie("REFRESH_TOKEN", refresh_token, {
                 httpOnly: true,
-                maxAge: 60*1000,
+                maxAge: 60*10*1000,
                 sameSite:"none",
                 secure: true,
             })

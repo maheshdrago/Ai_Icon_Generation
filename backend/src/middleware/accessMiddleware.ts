@@ -10,6 +10,7 @@ import { prismaClient } from "..";
 export const accessMiddleware = async (req:Request, res:Response, next:NextFunction) => {
 
     let token = req.headers.authorization || ""
+    console.log(token)
 
     if( !token){
         next(new AuthorizationError("Access Denied: Invalid token", ErrorCode.UNAUTHORIZED_ERROR, null))
@@ -17,6 +18,7 @@ export const accessMiddleware = async (req:Request, res:Response, next:NextFunct
 
     try{
         token = token.split(" ")[1]
+
         const payload = jwt.verify(token, ACCESS_TOKEN_KEY,) as any
         const email = payload.email
         const user = await prismaClient.user.findFirst({where:{email}})
