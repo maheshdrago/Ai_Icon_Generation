@@ -2,13 +2,18 @@ import { useEffect, useState } from "react";
 import "../App.css";
 import axiosInstance from "../utils/axiosInstance";
 import { useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../utils/constants";
+import { updateToken } from "../utils/store/slices/iconGen";
 
 const Login = ({ is_loggedin}:{is_loggedin:boolean}) => {
+
+  const navigate = useNavigate()
+  const dispatch = useAppDispatch()
+
+  const token = useAppSelector(state => state.icon.API_BEARER_TOKEN)
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [token, setToken] = useState("");
-  
-  const navigate = useNavigate()
+
 
   const login = async (e:React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -17,8 +22,8 @@ const Login = ({ is_loggedin}:{is_loggedin:boolean}) => {
       email,
       password,
     });
-    console.log(response)
-    setToken(response.data.access_token);
+    const data = await response.data
+    dispatch(updateToken(data.access_token))
 
   };
 

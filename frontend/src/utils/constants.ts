@@ -1,3 +1,6 @@
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "./store/store";
+
 type Color = {
     name: string,
     hex: string
@@ -55,4 +58,7 @@ export const colors:  Color[]= [
     "Watercolor",
     "Woodcut"
   ]
+
+export const useAppDispatch = useDispatch.withTypes<AppDispatch>()
+export const useAppSelector = useSelector.withTypes<RootState>()
   
