@@ -8,3 +8,12 @@
   grid-template-columns: repeat(auto-fit, minmax(4rem, 1fr));
   gap: 3rem;
 }
+
+.slider::-webkit-slider-thumb {
+  appearance: none;
+  height: 22px;
+  width: 22px;
+  border-radius: 50%;
+  background-color: black;
+  cursor: pointer;
+}

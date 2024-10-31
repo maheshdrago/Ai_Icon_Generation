@@ -55,12 +55,12 @@ export const login = async (req:Request, res:Response, next:NextFunction) => {
         }
 
         else if(bcrypt.compareSync(password, user.password)){
-            const access_token = jwt.sign({email}, ACCESS_TOKEN_KEY, {expiresIn: "1d"}, )
-            const refresh_token = jwt.sign({email}, REFRESH_TOKEN_KEY, {expiresIn:"10m"})
+            const access_token = jwt.sign({email}, ACCESS_TOKEN_KEY, {expiresIn: "10m"}, )
+            const refresh_token = jwt.sign({email}, REFRESH_TOKEN_KEY, {expiresIn:"1d"})
 
             res.cookie("REFRESH_TOKEN", refresh_token, {
                 httpOnly: true,
-                maxAge: 60*10*1000,
+                maxAge: 24*60*60*1000,
                 sameSite:"none",
                 secure: true,
             })
@@ -95,7 +95,7 @@ export const refreshAccessToken = async (req:Request, res:Response, next:NextFun
                 next(new AuthorizationError("User unauthorized", ErrorCode.UNAUTHORIZED_ERROR, null))
             }
             else{
-                const accessToken = jwt.sign({email}, ACCESS_TOKEN_KEY, {expiresIn:"30s"})
+                const accessToken = jwt.sign({email}, ACCESS_TOKEN_KEY, {expiresIn:"10m"})
                 res.json({
                     access_token: accessToken
                 })

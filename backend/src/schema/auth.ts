@@ -13,5 +13,9 @@ export const LoginSchema = z.object({
 
 
 export const PromptReqSchema = z.object({
-  prompt: z.string()
+  prompt: z.string(),
+  num_images: z.number(),
+  color: z.string(),
+  customColor:z.string(),
+  iconStyle: z.string()
 })
