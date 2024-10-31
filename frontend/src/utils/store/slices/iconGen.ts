@@ -13,9 +13,13 @@ const iconSlice = createSlice({
     reducers: {
         updateToken: (state, action) => {
             state.API_BEARER_TOKEN = action.payload
+        },
+
+        clearToken: (state) => {
+            state.API_BEARER_TOKEN = ""
         }
     }
 })
 
-export const { updateToken} = iconSlice.actions
+export const { updateToken,clearToken} = iconSlice.actions
 export default iconSlice.reducer

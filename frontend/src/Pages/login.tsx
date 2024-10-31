@@ -31,7 +31,7 @@ const Login = ({ is_loggedin}:{is_loggedin:boolean}) => {
 
   useEffect(() => {
     if(token){
-      navigate("/dashboard", {state: { token }})
+      navigate("/")
     }
   }, [token])
 
