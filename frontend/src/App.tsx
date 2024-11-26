@@ -8,6 +8,7 @@ import axiosInstance from "./utils/axiosInstance";
 import { useAppDispatch } from "./utils/constants";
 import { updateToken } from "./utils/store/slices/iconGen";
 import { useEffect } from "react";
+import { Toaster } from "@/components/ui/toaster"
 
 function App() {
   const is_loggedin = true
@@ -40,6 +41,7 @@ function App() {
         <Route path="/signup" element={<SignUp is_loggedin={is_loggedin}/>} />
         <Route path="/" element={<Dashboard is_loggedin={is_loggedin}/>} />
       </Routes>
+      <Toaster/>
     </div>
   );
 }
