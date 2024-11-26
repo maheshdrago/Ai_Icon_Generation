@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../utils/constants";
 import { updateToken } from "../utils/store/slices/iconGen";
 
-const Login = ({ is_loggedin}:{is_loggedin:boolean}) => {
+const Login = () => {
 
   const navigate = useNavigate()
   const dispatch = useAppDispatch()

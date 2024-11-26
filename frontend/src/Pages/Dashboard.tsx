@@ -23,7 +23,6 @@ const Dashboard = ({ is_loggedin }: { is_loggedin: boolean }) => {
   const [image, setImage] = useState([]);
   const [prompt, setPrompt] = useState<string>("");
   const [customColor, setCustomColor] = useState<string>("");
-  const [isGenerated, setIsGenerated] = useState(false);
   const [numImages, setNumImages] = useState<number>(2);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hasOutput, setHasOutput] = useState<boolean>(false);
@@ -51,7 +50,7 @@ const Dashboard = ({ is_loggedin }: { is_loggedin: boolean }) => {
       );
 
       const data = await response.data;
-      setIsGenerated(true);
+
       setImage(data.images);
       toast({
         description: "Your images are generated.",
@@ -98,7 +97,6 @@ const Dashboard = ({ is_loggedin }: { is_loggedin: boolean }) => {
       );
 
       const data = await response.data;
-      setIsGenerated(true);
       setImage(data.images);
     } catch (err: any) {
       if (err.response?.data?.errorCode === 4002) {

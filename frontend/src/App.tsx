@@ -37,8 +37,8 @@ function App() {
   return (
     <div className="flex">
       <Routes>
-        <Route path="/login" element={<Login is_loggedin={is_loggedin}/>} />
-        <Route path="/signup" element={<SignUp is_loggedin={is_loggedin}/>} />
+        <Route path="/login" element={<Login/>} />
+        <Route path="/signup" element={<SignUp />} />
         <Route path="/" element={<Dashboard is_loggedin={is_loggedin}/>} />
       </Routes>
       <Toaster/>

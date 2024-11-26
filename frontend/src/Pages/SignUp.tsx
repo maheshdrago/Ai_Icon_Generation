@@ -1,6 +1,6 @@
 import React from "react";
 
-const SignUp = ({ is_loggedin}:{is_loggedin:boolean}) => {
+const SignUp = () => {
   return (
     <div className="flex w-full h-screen">
       <div className="w-full flex flex-col items-center justify-center bg-white px-10 py-20 rounded-3xl border border-grey">
