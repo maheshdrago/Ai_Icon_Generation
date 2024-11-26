@@ -1,9 +1,9 @@
 import axios from "axios";
 import { refreshToken } from "./auth";
-
+console.log(import.meta.env.VITE_NODE_BACKEND_URL)
 const axiosInstance = axios.create({
     
-    baseURL: "http://localhost:3000/api/",
+    baseURL: import.meta.env.VITE_NODE_BACKEND_URL,
     withCredentials:true,
 })
 
