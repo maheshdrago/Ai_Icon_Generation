@@ -6,10 +6,13 @@ import { colors, IconStyles } from "../utils/constants";
 import { SliderTab, SliderTabItem } from "../components/SliderTab";
 import { useAppDispatch, useAppSelector } from "../utils/constants";
 import { clearToken } from "../utils/store/slices/iconGen";
+import { useToast } from "@/hooks/use-toast"
 import { BarLoader } from "react-spinners";
+
 
 const Dashboard = ({ is_loggedin }: { is_loggedin: boolean }) => {
   const navigate = useNavigate();
+  const { toast } = useToast()
 
   const api_key = useAppSelector((state) => state.icon.API_BEARER_TOKEN);
   const dispatch = useAppDispatch();
@@ -23,12 +26,14 @@ const Dashboard = ({ is_loggedin }: { is_loggedin: boolean }) => {
   const [isGenerated, setIsGenerated] = useState(false);
   const [numImages, setNumImages] = useState<number>(2);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [hasOutput, setHasOutput] = useState<boolean>(false)
+  const [hasOutput, setHasOutput] = useState<boolean>(false);
+  const [URL, setURL] = useState<string>("")
 
   const generateImage = async () => {
     try {
-      setHasOutput(true)
+      setHasOutput(true);
       setIsLoading(true);
+      
       const response = await axiosInstance.post(
         "/image/generate",
         {
@@ -36,7 +41,54 @@ const Dashboard = ({ is_loggedin }: { is_loggedin: boolean }) => {
           num_images: numImages,
           color: color || "",
           customColor: customColor || "",
-          iconStyle: iconStyle || ""
+          iconStyle: iconStyle || "",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${api_key}`,
+          },
+        }
+      );
+
+      const data = await response.data;
+      setIsGenerated(true);
+      setImage(data.images);
+      toast({
+        description: "Your images are generated.",
+        duration: 3
+      })
+    } catch (err: any) {
+      if (err.response?.data?.errorCode === 4002) {
+        dispatch(clearToken());
+        navigate("/login", { replace: true });
+      }
+      else if(err.response?.data?.errorCode === 5002){
+        toast({
+          variant:"destructive",
+          description: "Site cannot be scraped",
+          duration: 3
+        })
+      }
+      else{
+        console.log("Error", err)
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const generateImageFromURL = async () => {
+    try {
+      setHasOutput(true);
+      setIsLoading(true);
+      const response = await axiosInstance.post(
+        "/image/generate_from_url",
+        {
+          url:URL,
+          num_images: numImages,
+          color: color || "",
+          customColor: customColor || "",
+          iconStyle: iconStyle || "",
         },
         {
           headers: {
@@ -53,6 +105,16 @@ const Dashboard = ({ is_loggedin }: { is_loggedin: boolean }) => {
         dispatch(clearToken());
         navigate("/login", { replace: true });
       }
+      else if(err.response?.data?.errorCode === 5002){
+        toast({
+          variant:"destructive",
+          title:"Error",
+          description: "Site cannot be scraped",
+        })
+      }
+      else{
+        console.log("Error", err)
+      }
     } finally {
       setIsLoading(false);
     }
@@ -60,8 +122,17 @@ const Dashboard = ({ is_loggedin }: { is_loggedin: boolean }) => {
 
   const handlePromptChange = (e) => {
     const prompt = e.target.value;
+    if(URL != "")
+      setURL("")
     setPrompt(prompt);
   };
+
+  const handleURLChange = (e) => {
+    const url = e.target.value;
+    if(prompt != "")
+      setPrompt("")
+    setURL(url);
+  }
 
   const handleCustomColorChange = (e) => {
     const colorCode = e.target.value;
@@ -96,6 +167,16 @@ const Dashboard = ({ is_loggedin }: { is_loggedin: boolean }) => {
             Your results may vary. We are working on fine tuning results for
             each style. Here are some tips to make better icons:
           </p>
+          <button
+      onClick={() => {
+        toast({
+          title: "Scheduled: Catch up",
+          description: "Friday, February 10, 2023 at 5:57 PM",
+        })
+      }}
+    >
+      Show Toast
+    </button>
           <ul className="list-disc list-inside flex flex-col gap-2 pl-12">
             <li>
               Do not ask for words or letters, AI does not generate characters
@@ -108,13 +189,21 @@ const Dashboard = ({ is_loggedin }: { is_loggedin: boolean }) => {
         </section>
 
         <div className="flex flex-col justify-start items-start w-[80%] gap-2 my-8">
-          <p className="text-2xl font-semibold my-6">
-            1. Describe your icon using a noun and adjective
+          <p className="text-2xl font-semibold my-6 whitespace-nowrap">
+            1. Use a descriptive prompt or about page URL of a site 
           </p>
           <input
             placeholder="an angry bird"
             className="w-full p-2 outline- border-[#ebe9e7] border "
             onChange={handlePromptChange}
+            value={prompt}
+          ></input>
+          <span className="mx-auto items-center text-2xl font-semibold p-3">Or</span>
+          <input
+            placeholder="http://example.com/about"
+            className="w-full p-2 outline- border-[#ebe9e7] border "
+            onChange={handleURLChange}
+            value={URL}
           ></input>
         </div>
 
@@ -129,12 +218,39 @@ const Dashboard = ({ is_loggedin }: { is_loggedin: boolean }) => {
             className="flex flex-col justify-center items-center gap-4 w-[100%]"
           >
             <SliderTabItem className="color-selector gap-4 w-full ">
-              {colors.map((color) => (
+              {colors.map((color_) => (
                 <div
-                  style={{ background: color.hex }}
-                  className={`rounded-md shadow-lg p-3 h-[4rem] w-[4rem] opacity-60 hover:opacity-95 hover:scale-[1.2] transition-all ease-in-out delay-100 cursor-pointer`}
-                  onClick={() => setColor(color.name)}
-                ></div>
+                  style={{ background: color_.hex }}
+                  className={`relative rounded-md shadow-lg p-3 h-[4rem] w-[4rem] opacity-60 hover:opacity-95 hover:scale-[1.2] transition-all ease-in-out delay-100 cursor-pointer`}
+                  onClick={() => setColor(color => color_.name==color ? "" : color_.name)}
+                >
+                  <div
+                    className={`absolute inset-0  opacity-50 rounded-md ${
+                      color.toLowerCase() === color_.name
+                        ? "block"
+                        : "hidden"
+                    }`}
+                    style={{
+                      backgroundColor: "rgba(0, 0, 0, 0.3)",
+                    }}
+                  ></div>
+                  <div
+                    className={`absolute top-1 right-1 bg-white rounded-full p-1 ${
+                      color.toLowerCase() ===  color_.name
+                        ? "block"
+                        : "hidden"
+                    }`}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="black"
+                      className="w-4 h-4"
+                    >
+                      <path d="M9 16.2l-3.5-3.5a1 1 0 10-1.4 1.4l4.5 4.5a1 1 0 001.4 0l10-10a1 1 0 10-1.4-1.4L9 16.2z" />
+                    </svg>
+                  </div>
+                </div>
               ))}
             </SliderTabItem>
 
@@ -171,7 +287,7 @@ const Dashboard = ({ is_loggedin }: { is_loggedin: boolean }) => {
                 className={`relative h-24 w-24 rounded-md shadow-md cursor-pointer hover:scale-[1.2] transition-all delay-100 ease-in-out ${
                   icon.toLowerCase() === iconStyle ? "scale-110" : ""
                 }`}
-                onClick={() => setIconStyle(icon.toLowerCase())}
+                onClick={() => setIconStyle(iconStyle => iconStyle == icon?.toLowerCase() ? "" : icon?.toLowerCase())}
               >
                 <div
                   className={`absolute inset-0  opacity-50 rounded-md ${
@@ -220,26 +336,38 @@ const Dashboard = ({ is_loggedin }: { is_loggedin: boolean }) => {
 
         <button
           className="w-3/6 bg-black shadow-lg p-4 rounded-md text-white mb-14"
-          onClick={generateImage}
+          onClick={() => prompt=="" ? generateImageFromURL() : generateImage()}
         >
           Generate Icons
         </button>
       </div>
 
-      {(hasOutput)? <div className="flex flex-wrap justify-start items-start w-full h-full">
-        <div className="flex flex-col gap-5 flex-wrap w-5/6 min-h-[30%] max-h-max transition-all duration-300 ease-linear p-6 mt-8 border-solid border-2 border-gray-300 rounded-md ">
-          <p className="text-2xl font-bold ">Output</p>
-          <div className={`flex flex-wrap gap-4 p-2 w-full ${isLoading? "justify-center items-center": ""} `}>
-            {isLoading ? (
-              <BarLoader className="h-4 w-2/4 " width={300}/>
-            ) : (
-              image.map((i) => (
-                <img src={i} className="w-56 h-56 rounded-lg shadow-md" color=""></img>
-              ))
-            )}
+      {hasOutput ? (
+        <div className="flex flex-wrap justify-start items-start w-full h-full">
+          <div className="flex flex-col gap-5 flex-wrap w-5/6 min-h-[30%] max-h-max transition-all duration-300 ease-linear p-6 mt-8 border-solid border-2 border-gray-300 rounded-md ">
+            <p className="text-2xl font-bold ">Output</p>
+            <div
+              className={`flex flex-wrap gap-4 p-2 w-full ${
+                isLoading ? "justify-center items-center" : ""
+              } `}
+            >
+              {isLoading ? (
+                <BarLoader className="h-4 w-2/4 " width={300} />
+              ) : (
+                image.map((i) => (
+                  <img
+                    src={i}
+                    className="w-56 h-56 rounded-lg shadow-md"
+                    color=""
+                  ></img>
+                ))
+              )}
+            </div>
           </div>
         </div>
-      </div> : ""}
+      ) : (
+        ""
+      )}
     </div>
   );
 };
